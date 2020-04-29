@@ -1,0 +1,23 @@
+body {
+  background:rgb(50, 50, 50);
+	padding:0;
+	margin:0;
+}
+
+#canvas{
+	background:blue;
+	position:absolute;
+	left:50%;
+	margin-left:-300px;
+	margin-top:20px;
+}
+
+#canvasDiv
+{
+	width: 100%;
+}
+
+img
+{
+	display = none;
+}
