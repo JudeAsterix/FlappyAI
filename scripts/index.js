@@ -4,7 +4,7 @@ var timer;
 var height = 700;
 var width =  600;
 var gravity = 1;
-var numberOfBirds = 25;
+var numberOfBirds = 16;
 canDiv.height = height;
 canDiv.width = width;
 canDiv.focus();
@@ -39,6 +39,7 @@ function Stage()
 	this.bestBirds = []; 
 	this.generationNumber = 1;
 	this.pipeNumber = 0;
+	this.brainVisualizer = new BrainVisual(this.birds[0].brain);
 	
 	this.getInputsForBirds = function()
 	{
@@ -85,10 +86,12 @@ function Stage()
 		context.fillStyle = "black";
 		context.textAlign = "left";
 		context.fillText("Generation " + this.generationNumber, 10, 25);
-		
+		context.fillText("Number of Birds Alive: " + this.birds.length, 10, 50);
 		context.font = "50px Arial";
 		context.textAlign = "center";
 		context.fillText(this.pipeNumber, 300, 55);
+		
+		this.brainVisualizer.draw();
 	}
 
 	this.update = function()
@@ -178,6 +181,8 @@ function Stage()
 		this.generationNumber++;
 		this.bestBirds = [];
 		this.pipeNumber = 0;
+		
+		this.brainVisualizer.setBrain(this.birds[0].brain);
 	}
 	
 	this.keyDownReporter = function(event)
@@ -345,8 +350,6 @@ function FlappyBrain()
 	this.weightsho = [[rNode()],[rNode()],[rNode()],[rNode()],[rNode()]];
 	
 	this.mutationChance = 0.1;
-	this.visual = new BrainVisual(this);
-	this.visualShow = false;
 	
 	this.getInput = function(vel, height, x_dist, y_dist_top, y_dist_bottom)
 	{
@@ -440,7 +443,7 @@ function FlappyBrain()
 
 function BrainVisual(brain)
 {
-	Entity.call(this, width - 200, height - 120, 180, 100);
+	Entity.call(this, 10, height - 120, 180, 100);
 	this.brain = brain;
 	
 	this.draw = function()
@@ -448,6 +451,98 @@ function BrainVisual(brain)
 		context.fillStyle = "white";
 		context.strokeStyle = "black";
 		context.fillRect(this.x, this.y, this.width, this.height);
+		
+		for(var from = 0; from < 5; from++)
+		{
+			for(var to = 0; to < 5; to++)
+			{
+				if(Math.abs(this.brain.weightsih[from][to]) > 0.6)
+				{
+						if(this.brain.weightsih[from][to] < 0)
+					{
+						context.strokeStyle = "red";
+					}
+					else if(this.brain.weightsih[from][to] > 0)
+					{
+						context.strokeStyle = "green";
+					}
+					
+					context.beginPath();
+					context.moveTo(this.x + 20, this.y + 5 + (from * 20) + 5);
+					context.lineTo(this.x + 90, this.y + 5 + (to * 20) + 5);
+					context.stroke();
+				}
+			}
+		}
+		
+		for(var from = 0; from < 5; from++)
+		{
+			for(var to = 0; to < 1; to++)
+			{
+				if(Math.abs(this.brain.weightsho[from][to]) > 0.6)
+				{
+						if(this.brain.weightsho[from][to] < 0)
+					{
+						context.strokeStyle = "red";
+					}
+					else if(this.brain.weightsih[from][to] > 0)
+					{
+						context.strokeStyle = "green";
+					}
+					
+					context.beginPath();
+					context.moveTo(this.x + 90, this.y + 5 + (from * 20) + 5);
+					context.lineTo(this.x + 160, this.y + 45);
+					context.stroke();
+				}
+			}
+		}
+		
+		for(var firstLayer = 0; firstLayer < 5; firstLayer++)
+		{
+			if(this.brain.inputNodes[firstLayer] < 0)
+			{
+				context.fillStyle = "red";
+			}
+			else if(this.brain.inputNodes[firstLayer] > 0)
+			{
+				context.fillStyle = "green";
+			}
+			
+			context.fillRect(this.x + 15, this.y + 5 + (firstLayer * 20), 10, 10);
+		}
+		
+		for(var firstLayer = 0; firstLayer < 5; firstLayer++)
+		{
+			if(this.brain.hiddenNodes[firstLayer] < 0)
+			{
+				context.fillStyle = "red";
+			}
+			else if(this.brain.hiddenNodes[firstLayer] > 0)
+			{
+				context.fillStyle = "green";
+			}
+			
+			context.fillRect(this.x + 85, this.y + 5 + (firstLayer * 20), 10, 10);
+		}
+		
+		if(this.brain.outputNodes[0] < 0)
+		{
+			context.fillStyle = "red";
+		}
+		else if(this.brain.outputNodes[0] > 0)
+		{
+			context.fillStyle = "green";
+		}
+		
+		context.fillStyle = "red";
+		
+		context.fillRect(this.x + 155, this.y + 40, 10, 10);
+	}
+	
+	this.setBrain = function(brain)
+	{
+		this.brain = brain;
 	}
 }
 
